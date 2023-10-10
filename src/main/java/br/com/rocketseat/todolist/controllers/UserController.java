@@ -1,6 +1,9 @@
 package br.com.rocketseat.todolist.controllers;
 
 import br.com.rocketseat.todolist.domain.models.UserModel;
+import br.com.rocketseat.todolist.domain.repositories.UserModelRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,13 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
+    private final UserModelRepository repository;
+
     @PostMapping("/")
-    public ResponseEntity<UserModel> create(@RequestBody UserModel user) {
+    public ResponseEntity<Object> create(@RequestBody UserModel user) {
+        var requestUser = this.repository.findByUsername(user.getUsername());
 
-        System.out.println(user.getName());
+        if (requestUser != null)
+            return new ResponseEntity<>("User Alerdy Exists", HttpStatus.BAD_REQUEST);
 
-        return ResponseEntity.ok().build();
+        var dbUser = this.repository.save(user);
+        return new ResponseEntity<>(dbUser, HttpStatus.CREATED);
     }
 }
