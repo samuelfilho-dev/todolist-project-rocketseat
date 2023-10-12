@@ -20,7 +20,7 @@ public class TaskController {
     private final TaskModelRepository repository;
 
     @PostMapping("/")
-    public ResponseEntity<Object> create(@RequestBody TaskModel task, HttpServletRequest request) {
+    public ResponseEntity<Object> createTask(@RequestBody TaskModel task, HttpServletRequest request) {
 
         var idUser = request.getAttribute("idUser");
         task.setIdUser((UUID) idUser);
@@ -45,5 +45,16 @@ public class TaskController {
 
         var tasks = this.repository.findByIdUser((UUID) idUser);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskModel> updateTask(@RequestBody TaskModel task, @PathVariable UUID id, HttpServletRequest request) {
+        var idUser = request.getAttribute("idUser");
+
+        task.setId(id);
+        task.setIdUser((UUID) idUser);
+        this.repository.save(task);
+
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
 }
