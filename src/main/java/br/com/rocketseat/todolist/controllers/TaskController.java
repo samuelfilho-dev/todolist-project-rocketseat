@@ -2,6 +2,7 @@ package br.com.rocketseat.todolist.controllers;
 
 import br.com.rocketseat.todolist.domain.models.TaskModel;
 import br.com.rocketseat.todolist.domain.repositories.TaskModelRepository;
+import br.com.rocketseat.todolist.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,10 +52,13 @@ public class TaskController {
     public ResponseEntity<TaskModel> updateTask(@RequestBody TaskModel task, @PathVariable UUID id, HttpServletRequest request) {
         var idUser = request.getAttribute("idUser");
 
+        var dbTask = this.repository.findById(id).orElse(null);
+        Utils.copyNonNullProperties(task, dbTask);
+
         task.setId(id);
         task.setIdUser((UUID) idUser);
-        this.repository.save(task);
+        this.repository.save(dbTask);
 
-        return new ResponseEntity<>(task, HttpStatus.OK);
+        return new ResponseEntity<>(dbTask, HttpStatus.OK);
     }
 }
