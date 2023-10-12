@@ -1,5 +1,6 @@
 package br.com.rocketseat.todolist.controllers;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.com.rocketseat.todolist.domain.models.UserModel;
 import br.com.rocketseat.todolist.domain.repositories.UserModelRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,11 @@ public class UserController {
         if (requestUser != null)
             return new ResponseEntity<>("User Alerdy Exists", HttpStatus.BAD_REQUEST);
 
+        var passwordHashed = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
+
+        user.setPassword(passwordHashed);
         var dbUser = this.repository.save(user);
+
         return new ResponseEntity<>(dbUser, HttpStatus.CREATED);
     }
 }
