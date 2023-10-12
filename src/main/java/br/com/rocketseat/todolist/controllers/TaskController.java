@@ -6,12 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,11 +31,19 @@ public class TaskController {
             return new ResponseEntity<>("StartAt and EndAt must be greater than Current Date", HttpStatus.BAD_REQUEST);
         }
 
-        if (task.getStartAt().isAfter(task.getEndAt())){
+        if (task.getStartAt().isAfter(task.getEndAt())) {
             return new ResponseEntity<>("StartAt must be smaller than EndAt", HttpStatus.BAD_REQUEST);
         }
 
         var dbTask = this.repository.save(task);
         return new ResponseEntity<>(dbTask, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<TaskModel>> listAll(HttpServletRequest request) {
+        var idUser = request.getAttribute("idUser");
+
+        var tasks = this.repository.findByIdUser((UUID) idUser);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 }
