@@ -49,10 +49,19 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskModel> updateTask(@RequestBody TaskModel task, @PathVariable UUID id, HttpServletRequest request) {
+    public ResponseEntity<Object> updateTask(@RequestBody TaskModel task, @PathVariable UUID id, HttpServletRequest request) {
         var idUser = request.getAttribute("idUser");
 
         var dbTask = this.repository.findById(id).orElse(null);
+
+        if (dbTask == null){
+            return new ResponseEntity<>("Task hasn't exists");
+        }
+
+        if(!task.getIdUser().equals(idUser)){
+            return new ResponseEntity<>("User doesn't has Autority", HttpStatus.FORBIDDEN);
+        }
+
         Utils.copyNonNullProperties(task, dbTask);
 
         task.setId(id);
