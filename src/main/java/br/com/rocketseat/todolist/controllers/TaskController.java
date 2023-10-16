@@ -54,11 +54,11 @@ public class TaskController {
 
         var dbTask = this.repository.findById(id).orElse(null);
 
-        if (dbTask == null){
-            return new ResponseEntity<>("Task hasn't exists");
+        if (dbTask == null) {
+            return new ResponseEntity<>("Task hasn't exists", HttpStatus.BAD_REQUEST);
         }
 
-        if(!task.getIdUser().equals(idUser)){
+        if (!task.getIdUser().equals(idUser)) {
             return new ResponseEntity<>("User doesn't has Autority", HttpStatus.FORBIDDEN);
         }
 
